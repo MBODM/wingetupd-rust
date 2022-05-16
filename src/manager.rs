@@ -1,7 +1,7 @@
 mod winget;
 
 pub fn search_package(id: &str) -> bool {
-    let result = winget::winget_run(format!("search --exact --id", id))?;
+    let result = winget::winget_run(format!("search --exact --id {}", id))?;
     return result.exit_code == 0;
 }
 
@@ -14,7 +14,7 @@ pub struct ListResult {
 }
 
 pub fn list_package(id: &str) -> ListResult {
-    let result = winget::winget_run(format!("search --exact --id", id))?;
+    let result = winget::winget_run(format!("list --exact --id {}", id))?;
     return ListResult {
         package: id.to_string(),
         is_installed: false,
@@ -25,6 +25,6 @@ pub fn list_package(id: &str) -> ListResult {
 }
 
 pub fn upgrade_package(id: &str) -> bool {
-    let result = winget_run(format!("search --exact --id", id))?;
+    let result = winget::winget_run(format!("search --exact --id {}", id))?;
     return result.exit_code == 0;
 }
