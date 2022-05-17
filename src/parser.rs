@@ -32,26 +32,26 @@ impl ParseResult {
     }
 }
 
-pub fn Parse(console_output: &str) -> ParseResult{
-    // WinGet list output example:
-    /*
-    Name                         ID                                    Version Verfügbar Quelle
-    -------------------------------------------------------------------------------------------
-    Visual Studio Community 2022 Microsoft.VisualStudio.2022.Community 17.1.6  17.2.0    winget
-    */
+// pub fn Parse(console_output: &str) -> ParseResult{
+//     // WinGet list output example:
+//     /*
+//     Name                         ID                                    Version Verfügbar Quelle
+//     -------------------------------------------------------------------------------------------
+//     Visual Studio Community 2022 Microsoft.VisualStudio.2022.Community 17.1.6  17.2.0    winget
+//     */
 
-    let regex = Regex::new(r"\d+(\.\d+)+").expect("parser");
-    let matches = regex.find_iter("").count();
+//     let regex = Regex::new(r"\d+(\.\d+)+").expect("parser");
+//     let matches = regex.find_iter("").count();
 
-    if matches == 0
-    {
-        return ParseResult::new();
-    }
+//     if matches == 0
+//     {
+//         return ParseResult::new();
+//     }
 
-    if matches > 2
-    {
-        //error
-    }
+//     if matches > 2
+//     {
+//         //error
+//     }
 
             // var regex = new Regex(@"\d+(\.\d+)+");
             // var matches = regex.Matches(listOutput);
@@ -74,4 +74,4 @@ pub fn Parse(console_output: &str) -> ParseResult{
 
             // return new WinGetOutputParserListResult(isUpdatable, oldVersion, newVersion);
 
-}
+//}

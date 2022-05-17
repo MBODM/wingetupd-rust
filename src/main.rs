@@ -1,6 +1,6 @@
-mod manager;
-mod winget;
+mod packages;
 mod parser;
+mod winget;
 
 const EXIT_SUCCESS: i32 = 0;
 const EXIT_FAILURE: i32 = 1;
@@ -12,17 +12,19 @@ fn main() {
 
 fn main_with_exit_code() -> i32 {
     if !winget::installed() {
-        return show_str_and_exit("WinGet not installed.");
+        return show_error_and_exit("WinGet not installed.");
     }
-    let is_valid = manager::search("Mozilla.Firefox");
-    if is_valid {
-        let list_result = manager::list("Mozilla.Firefox");
+    let is_valid = match packages::search("ozilla.Firefox") {
+        Ok(b) => b,
+        Err(s) => return show_error_and_exit(s.as_str()),
+    };
+    if (is_valid) {
+        println!("valid");
     }
-
     return EXIT_SUCCESS;
 }
 
-fn show_str_and_exit(s: &str) -> i32 {
-    println!("Error: {}", s);
+fn show_error_and_exit(error_message: &str) -> i32 {
+    println!("Error: {}", error_message);
     return EXIT_FAILURE;
 }

@@ -1,9 +1,9 @@
 use std::process::Command;
 
-const WIN_GET_APP: &str = "winget.exe";
+const WINGET_APP: &str = "winget.exe";
 
 pub fn installed() -> bool {
-    match Command::new(WIN_GET_APP).arg("--version").output() {
+    match Command::new(WINGET_APP).arg("--version").output() {
         Ok(output) => return output.status.success(),
         Err(_) => return false,
     };
@@ -15,16 +15,26 @@ pub struct WinGetResultData {
     pub exit_code: i32,
 }
 
-// We using expect() for a reason here, instead of using the typical Rust Result<> pattern.
-
-pub fn run(params: &str) -> WinGetResultData {
-    let output = Command::new(WIN_GET_APP).args(params.split(" ")).output().expect("winget");
-    let string = String::from_utf8(output.stdout).expect("winget");
-    return WinGetResultData {
-        process_call: format!("{} {}", WIN_GET_APP, params),
-        console_output: remove_progressbar_chars(string).trim().to_owned(),
-        exit_code: output.status.code().unwrap_or(1),
+pub fn run(params: &str) -> Result<WinGetResultData, String> {
+    let params = params.trim();
+    assert!(!params.is_empty());
+    let output = Command::new(WINGET_APP)
+        .args(params.split(" "))
+        .output()
+        .map_err(|err| err.to_string())?;
+    let output_string = String::from_utf8(output.stdout)
+        .map_err(|err| err.to_string())?
+        .trim()
+        .to_string();
+    let result = WinGetResultData {
+        process_call: format!("{} {}", WINGET_APP, params),
+        console_output: remove_progressbar_chars(output_string),
+        exit_code: output
+            .status
+            .code()
+            .ok_or("WinGet not returned any exit code.")?,
     };
+    return Ok(result);
 }
 
 fn remove_progressbar_chars(s: String) -> String {
