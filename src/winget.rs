@@ -1,6 +1,7 @@
 use std::process::Command;
 
 const WINGET_APP: &str = "winget.exe";
+const ERROR_NO_EXITCODE: &str = "WinGet not returned any exit code.";
 
 pub fn installed() -> bool {
     match Command::new(WINGET_APP).arg("--version").output() {
@@ -16,16 +17,6 @@ pub struct RunResult {
     pub exit_code: i32,
 }
 
-impl RunResult {
-    pub const fn new() -> RunResult {
-        return RunResult {
-            process_call: String::new(),
-            console_output: String::new(),
-            exit_code: 1,
-        };
-    }
-}
-
 pub fn run(params: &str) -> Result<RunResult, String> {
     let params = params.trim();
     assert!(!params.is_empty());
@@ -37,15 +28,18 @@ pub fn run(params: &str) -> Result<RunResult, String> {
         .map_err(|err| err.to_string())?
         .trim()
         .to_string();
-    let run_result = RunResult {
-        process_call: format!("{} {}", WINGET_APP, params),
-        console_output: remove_progressbar_chars(output_string),
-        exit_code: output
-            .status
-            .code()
-            .ok_or("WinGet not returned any exit code.")?,
-    };
-    return Ok(run_result);
+    let process_call = create_process_call(params);
+    let console_output = remove_progressbar_chars(output_string);
+    let exit_code = output.status.code().ok_or(ERROR_NO_EXITCODE)?;
+    return Ok(RunResult {
+        process_call,
+        console_output,
+        exit_code,
+    });
+}
+
+fn create_process_call(params: &str) -> String {
+    return format!("{} {}", WINGET_APP, params);
 }
 
 fn remove_progressbar_chars(s: String) -> String {

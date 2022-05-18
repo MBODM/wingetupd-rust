@@ -1,4 +1,4 @@
-mod packages;
+mod commands;
 mod parser;
 mod winget;
 
@@ -11,18 +11,21 @@ fn main() {
 }
 
 fn main_with_exit_code() -> i32 {
-    parser::parse_winget_list_output("fuzz");
-    return 0;
     if !winget::installed() {
         return show_error_and_exit("WinGet not installed.");
     }
-    let is_valid = match packages::search("ozilla.Firefox") {
+    let is_valid = match commands::search("Mozilla.Firefox") {
         Ok(b) => b,
-        Err(s) => return show_error_and_exit(s.as_str()),
+        Err(s) => return show_error_and_exit(&s),
     };
-    if (is_valid) {
+    if is_valid {
         println!("valid");
     }
+    let list_result = match commands::list("Mozilla.Firefox") {
+        Ok(lr) => lr,
+        Err(s) => return show_error_and_exit(&s),
+    };
+    println!("{:#?}", list_result);
     return EXIT_SUCCESS;
 }
 
