@@ -10,9 +10,9 @@ But the main reason was: Let´s have some fun with Rust! 😁
 
 #### So let´s get rusty.
 
+----------
 
-
-###Temporary notes to myself:
+### Temporary notes to myself:
 
 ```
 fn main() {
