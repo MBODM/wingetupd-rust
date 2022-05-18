@@ -14,7 +14,8 @@ But the main reason was: Let´s have some fun with Rust! 😁
 
 Note to myself:
 
-`fn main() {
+```
+fn main() {
     let a = "hallo v1.0.1 und grüsse v2.0.2 zumir-06-17";
     let cap: Vec<&str> = Regex::new(r"\d+(\.\d+)+").unwrap().find_iter(a).map(|x| x.as_str()).collect();
     println!("{}", cap.len());
@@ -43,5 +44,6 @@ fn file_to_vec(filename: String) -> io::Result<Vec<String>> {
     let file_in = fs::File::open(filename)?; 
     let file_reader = BufReader::new(file_in); 
     Ok(file_reader.lines().filter_map(io::Result::ok).collect()) 
-}`
+}
+```
 
