@@ -11,6 +11,8 @@ fn main() {
 }
 
 fn main_with_exit_code() -> i32 {
+    parser::parse_winget_list_output("fuzz");
+    return 0;
     if !winget::installed() {
         return show_error_and_exit("WinGet not installed.");
     }

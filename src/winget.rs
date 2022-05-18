@@ -9,13 +9,24 @@ pub fn installed() -> bool {
     };
 }
 
-pub struct WinGetResultData {
+#[derive(Debug)]
+pub struct RunResult {
     pub process_call: String,
     pub console_output: String,
     pub exit_code: i32,
 }
 
-pub fn run(params: &str) -> Result<WinGetResultData, String> {
+impl RunResult {
+    pub const fn new() -> RunResult {
+        return RunResult {
+            process_call: String::new(),
+            console_output: String::new(),
+            exit_code: 1,
+        };
+    }
+}
+
+pub fn run(params: &str) -> Result<RunResult, String> {
     let params = params.trim();
     assert!(!params.is_empty());
     let output = Command::new(WINGET_APP)
@@ -26,7 +37,7 @@ pub fn run(params: &str) -> Result<WinGetResultData, String> {
         .map_err(|err| err.to_string())?
         .trim()
         .to_string();
-    let result = WinGetResultData {
+    let run_result = RunResult {
         process_call: format!("{} {}", WINGET_APP, params),
         console_output: remove_progressbar_chars(output_string),
         exit_code: output
@@ -34,7 +45,7 @@ pub fn run(params: &str) -> Result<WinGetResultData, String> {
             .code()
             .ok_or("WinGet not returned any exit code.")?,
     };
-    return Ok(result);
+    return Ok(run_result);
 }
 
 fn remove_progressbar_chars(s: String) -> String {
