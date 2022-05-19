@@ -1,8 +1,10 @@
-use crate::commands::list;
-
 mod commands;
-mod packages;
+mod config;
+mod core;
+mod helper;
 mod parser;
+mod printer;
+mod summary;
 mod winget;
 
 const EXIT_SUCCESS: i32 = 0;
@@ -17,62 +19,28 @@ fn main_with_exit_code() -> i32 {
     if !winget::installed() {
         return show_error_and_exit("WinGet not installed.");
     }
-    if !packages::package_file_exists() {
+    if !config::package_file_exists() {
         return show_error_and_exit("The package-file not exists.");
     }
-    let package_id_vec = match packages::read_package_file() {
-        Ok(v) => v,
-        Err(s) => return show_error_and_exit(&s),
+    let packages = match config::read_package_file() {
+        Ok(vec) => vec,
+        Err(err) => return show_error_and_exit(&err),
     };
-    if package_id_vec.len() == 0 {
+    if packages.len() == 0 {
         return show_error_and_exit("The package-file is empty.");
     }
-    for package_id in package_id_vec.iter() {
-        let res = match handle_one_package(&package_id) {
-            Ok(r) => r,
-            Err(error) => return show_error_and_exit(&error),
-        };
+    helper::console_write("processing ...");
+    let progress_closure = || helper::console_write(".");
+    let package_infos = match core::analyze(packages, progress_closure) {
+        Ok(pi) => pi,
+        Err(err) => return show_error_and_exit(&err),
+    };
+    helper::console_write("... finished.");
+    for package_info in package_infos.iter() {
+        println!("{}", package_info.package_id);
     }
     println!("Have a nice day.");
     return EXIT_SUCCESS;
-}
-
-fn handle_one_package(package_id: &str) -> Result <PackageInfo, String>
-{
-    let valid_package = commands::search(&package_id)?;
-    if valid_package {
-        println!("Valid package: {}", package_id);
-    }
-    let list_result = commands::list(&package_id)?;
-    if list_result.is_installed {
-        println!("Installed package: {}", package_id);
-    }
-    if list_result.is_updatable {
-        println!(
-            "{} has update: {} -> {}",
-            package_id, list_result.installed_version, list_result.update_version
-        );
-    }
-    println!();
-    return Ok(PackageInfo
-    {
-        package_id: package_id.to_string(),
-        is_valid: valid_package,
-        is_installed: list_result.is_installed,
-        is_updatable: list_result.is_updatable,
-        installed_version: list_result.installed_version,
-        update_version: list_result.update_version,
-    });
-}
-
-struct PackageInfo
-{
-    package_id: String,
-    is_valid: bool,
-    is_installed: bool,
-    is_updatable: bool,
-    installed_version: String,
-    update_version: String,
 }
 
 fn show_error_and_exit(error_message: &str) -> i32 {
