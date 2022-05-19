@@ -45,5 +45,20 @@ fn file_to_vec(filename: String) -> io::Result<Vec<String>> {
     let file_reader = BufReader::new(file_in); 
     Ok(file_reader.lines().filter_map(io::Result::ok).collect()) 
 }
+
+// IEnumerable as functiin param
+
+use std::collections::HashMap;
+
+fn find_min<'a>(vals: impl Iterator<Item = &'a u32>) -> Option<&'a u32> {
+    vals.min()
+}
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("zero", 0u32);
+    map.insert("one", 1u32);
+    println!("Min value {:?}", find_min(map.values()));
+}
 ```
 
