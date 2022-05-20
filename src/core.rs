@@ -2,7 +2,7 @@ use crate::commands;
 
 #[derive(Debug)]
 pub struct PackageInfo {
-    pub package_id: String,
+    pub package: String,
     pub is_valid: bool,
     pub is_installed: bool,
     pub is_updatable: bool,
@@ -10,29 +10,32 @@ pub struct PackageInfo {
     pub update_version: String,
 }
 
-pub fn analyze(packages: Vec<String>, progress: fn()) -> Result<Vec<PackageInfo>, String> {
+pub fn analyze<T>(packages: Vec<String>, progress: T) -> Result<Vec<PackageInfo>, String>
+where
+    T: Fn() -> (),
+{
     let package_infos: Result<Vec<PackageInfo>, String> = packages
         .iter()
         .map(|package| {
-            let package_id: String = package.into();
-            let valid_package = commands::search(&package_id)?;
+            let package: String = package.into();
+            let valid = commands::search(&package)?;
             progress();
-            let list_result = commands::list(&package_id)?;
+            let list_result = commands::list(&package)?;
             progress();
-            let package_info = create_package_info(package_id, valid_package, list_result);
+            let package_info = build_package_info(package, valid, list_result);
             return Ok(package_info);
         })
         .collect();
     return package_infos;
 }
 
-fn create_package_info(
-    package_id: String,
+fn build_package_info(
+    package: String,
     is_valid: bool,
     list_result: commands::ListResult,
 ) -> PackageInfo {
     return PackageInfo {
-        package_id,
+        package,
         is_valid,
         is_installed: list_result.is_installed,
         is_updatable: list_result.is_updatable,

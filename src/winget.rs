@@ -1,45 +1,56 @@
+use std::io;
 use std::process::Command;
 
 const WINGET_APP: &str = "winget.exe";
-const ERROR_NO_EXITCODE: &str = "WinGet not returned any exit code.";
 
-pub fn installed() -> bool {
-    match Command::new(WINGET_APP).arg("--version").output() {
-        Ok(output) => return output.status.success(),
-        Err(_) => return false,
-    };
+pub fn installed() -> Result<(), String> {
+    Command::new(WINGET_APP)
+        .arg("--version")
+        .output()
+        .map_err(|err| convert_io_error(err))?;
+    return Ok(());
 }
 
 #[derive(Debug)]
-pub struct RunResult {
+pub struct WinGetResult {
     pub process_call: String,
     pub console_output: String,
     pub exit_code: i32,
 }
 
-pub fn run(params: &str) -> Result<RunResult, String> {
+pub fn execute(params: &str) -> Result<WinGetResult, String> {
     let params = params.trim();
     assert!(!params.is_empty());
     let output = Command::new(WINGET_APP)
         .args(params.split(" "))
         .output()
-        .map_err(|err| err.to_string())?;
+        .map_err(|err| convert_io_error(err))?;
     let output_string = String::from_utf8(output.stdout)
-        .map_err(|err| err.to_string())?
+        .map_err(|_| String::from("WinGet output-format invalid."))?
         .trim()
         .to_string();
-    let process_call = create_process_call(params);
+    let process_call = build_process_call(params);
     let console_output = remove_progressbar_chars(output_string);
-    let exit_code = output.status.code().ok_or(ERROR_NO_EXITCODE)?;
-    return Ok(RunResult {
+    let exit_code = output
+        .status
+        .code()
+        .ok_or("WinGet not returned any exit code.")?;
+    return Ok(WinGetResult {
         process_call,
         console_output,
         exit_code,
     });
 }
 
-fn create_process_call(params: &str) -> String {
-    return format!("{} {}", WINGET_APP, params);
+fn convert_io_error(err: io::Error) -> String {
+    return match err.kind() {
+        io::ErrorKind::NotFound => String::from("WinGet not installed."),
+        _ => err.to_string(),
+    };
+}
+
+fn build_process_call(params: &str) -> String {
+    return format!("{WINGET_APP} {params}");
 }
 
 fn remove_progressbar_chars(s: String) -> String {
