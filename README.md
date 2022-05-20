@@ -60,5 +60,18 @@ fn main() {
     map.insert("one", 1u32);
     println!("Min value {:?}", find_min(map.values()));
 }
+
+fn main() {
+    let do_steps = || -> Result<(), MyError> {
+        do_step_1()?;
+        do_step_2()?;
+        do_step_3()?;
+        Ok(())
+    };
+
+    if let Err(_err) = do_steps() {
+        println!("Failed to perform necessary steps");
+    }
+}
 ```
 
