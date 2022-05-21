@@ -1,4 +1,4 @@
-use crate::commands;
+use crate::{app::AppResult, commands};
 
 #[derive(Debug)]
 pub struct PackageInfo {
@@ -10,11 +10,11 @@ pub struct PackageInfo {
     pub update_version: String,
 }
 
-pub fn analyze<T>(packages: Vec<String>, progress: T) -> Result<Vec<PackageInfo>, String>
+pub fn analyze<T>(packages: Vec<String>, progress: T) -> AppResult<Vec<PackageInfo>>
 where
     T: Fn() -> (),
 {
-    let package_infos: Result<Vec<PackageInfo>, String> = packages
+    packages
         .iter()
         .map(|package| {
             let package: String = package.into();
@@ -23,10 +23,9 @@ where
             let list_result = commands::list(&package)?;
             progress();
             let package_info = build_package_info(package, valid, list_result);
-            return Ok(package_info);
+            Ok(package_info)
         })
-        .collect();
-    return package_infos;
+        .collect()
 }
 
 fn build_package_info(
@@ -34,12 +33,12 @@ fn build_package_info(
     is_valid: bool,
     list_result: commands::ListResult,
 ) -> PackageInfo {
-    return PackageInfo {
+    PackageInfo {
         package,
         is_valid,
         is_installed: list_result.is_installed,
         is_updatable: list_result.is_updatable,
         installed_version: list_result.installed_version,
         update_version: list_result.update_version,
-    };
+    }
 }

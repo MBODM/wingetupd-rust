@@ -1,27 +1,24 @@
-use crate::{errors, core::PackageInfo};
+use crate::{core::PackageInfo, errors};
 use std::io::{stdout, Write};
 
-pub fn print(s: &str) {
-    print!("{s}");
+pub fn flush<T>(print_macro: T)
+where
+    T: Fn() -> (),
+{
+    print_macro();
     stdout().flush().expect(errors::UNRECOVERABLE);
 }
 
-pub fn print_line(s: &str) {
-    println!("{s}");
-    stdout().flush().expect(errors::UNRECOVERABLE);
-}
-
-pub fn print_usage(exe_file: &str, show_error: bool) {
+pub fn show_usage(exe_file: &str, show_error: bool) {
     if show_error {
         println!("Error: Unknown parameter(s).");
         println!();
     }
-
     println!("Usage: {exe_file} [--no-log] [--no-confirm]");
-    println!("");
+    println!();
     println!("  --no-log      Don´t create log file (useful when running from a folder without write permissions)");
     println!("  --no-confirm  Don´t ask for update confirmation (useful for script integration)");
-    println!("");
+    println!();
     println!(
         "For more information have a look at the GitHub page (https://github.com/MBODM/wingetupd"
     );
@@ -32,57 +29,54 @@ pub fn print_usage(exe_file: &str, show_error: bool) {
 //             println!($"Found package-file, containing {packageFileEntries.Count()} {EntryOrEntries(packageFileEntries)}.");
 //         }
 
-pub fn show_invalid_packages_error(packages: Vec<String>) {
+pub fn show_invalid_packages_error(invalid_packages: Vec<&String>) {
     println!("Error: The package-file contains invalid entries.");
     println!();
     println!("The following package-file entries are not valid WinGet package id´s:");
-    //ListPackages(invalidPackages);
+    list_packages(invalid_packages);
     println!();
     println!("You can use 'winget search' to list all valid package id´s.");
     println!();
     println!("Please verify package-file and try again.");
 }
 
-pub fn show_non_installed_packages_error() {
+pub fn show_non_installed_packages_error(non_installed_packages: Vec<&String>) {
     println!("Error: The package-file contains non-installed packages.");
     println!();
     println!("The following package-file entries are valid WinGet package id´s,");
     println!("but those packages are not already installed on this machine yet:");
-    // ListPackages(nonInstalledPackages);
+    list_packages(non_installed_packages);
     println!();
     println!("You can use 'winget list' to show all installed packages and their package id´s.");
     println!();
     println!("Please verify package-file and try again.");
 }
 
-pub fn show_summary(package_infos: Vec<PackageInfo>)
-{
-    let valid_packages: Vec<String> = package_infos.iter().filter(|x| x.is_valid).map(|y|&y.package).collect();
+pub fn show_summary(package_infos: Vec<PackageInfo>) {
+    //let valid_packages: Vec<String> = package_infos.iter().filter(|x| x.is_valid).map(|y|&y.package).collect();
 
-//             var validPackages = packageInfos.Where(packageInfo => packageInfo.IsValid).Select(packageInfo => packageInfo.Package);
-//             var installedPackages = packageInfos.Where(packageInfo => packageInfo.IsInstalled).Select(packageInfo => packageInfo.Package);
-//             var updatablePackages = packageInfos.Where(packageInfo => packageInfo.IsUpdatable);
+    //             var validPackages = packageInfos.Where(packageInfo => packageInfo.IsValid).Select(packageInfo => packageInfo.Package);
+    //             var installedPackages = packageInfos.Where(packageInfo => packageInfo.IsInstalled).Select(packageInfo => packageInfo.Package);
+    //             var updatablePackages = packageInfos.Where(packageInfo => packageInfo.IsUpdatable);
 
-//             println!($"{packageInfos.Count()} package-file {EntryOrEntries(packageInfos)} processed.");
+    //             println!($"{packageInfos.Count()} package-file {EntryOrEntries(packageInfos)} processed.");
 
-//             println!($"{validPackages.Count()} package-file {EntryOrEntries(packageInfos)} validated.");
+    //             println!($"{validPackages.Count()} package-file {EntryOrEntries(packageInfos)} validated.");
 
-//             println!($"{installedPackages.Count()} {PackageOrPackages(installedPackages)} installed:");
-//             ListPackages(installedPackages);
+    //             println!($"{installedPackages.Count()} {PackageOrPackages(installedPackages)} installed:");
+    //             ListPackages(installedPackages);
 
-//             Console.Write($"{updatablePackages.Count()} {PackageOrPackages(updatablePackages)} updatable");
-//             if (updatablePackages.Any())
-//             {
-//                 println!(":");
-//                 ListUpdateablePackages(updatablePackages);
-//             }
-//             else
-//             {
-//                 println!(".");
-//             }
-
+    //             Console.Write($"{updatablePackages.Count()} {PackageOrPackages(updatablePackages)} updatable");
+    //             if (updatablePackages.Any())
+    //             {
+    //                 println!(":");
+    //                 ListUpdateablePackages(updatablePackages);
+    //             }
+    //             else
+    //             {
+    //                 println!(".");
+    //             }
 }
-
 
 //         public static bool AskUpdateQuestion(IEnumerable<string> updateablePackages)
 //         {
@@ -120,10 +114,9 @@ pub fn show_summary(package_infos: Vec<PackageInfo>)
 //             ListPackages(updatedPackages);
 //         }
 
-//         public static void ShowGoodByeMessage()
-//         {
-//             println!("Have a nice day.");
-//         }
+pub fn show_goodby_message() {
+    println!("Have a nice day.");
+}
 
 //         public static void ShowWinGetError(string error, string log)
 //         {
@@ -154,6 +147,12 @@ pub fn show_summary(package_infos: Vec<PackageInfo>)
 
 //         private static string SingularOrPlural<T>(IEnumerable<T> enumerable, string singular, string plural) =>
 //             enumerable.Count() == 1 ? singular : plural;
+
+fn list_packages(packages: Vec<&String>) {
+    packages
+        .iter()
+        .for_each(|package| println!("  - {package}"))
+}
 
 //         private static void ListPackages(IEnumerable<string> packages) =>
 //             packages.ToList().ForEach(package => println!($"  - {package}"));
