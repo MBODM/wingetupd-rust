@@ -1,7 +1,3 @@
-use app::AppResult;
-
-use crate::args::valid;
-
 mod app;
 mod args;
 mod commands;
@@ -9,8 +5,9 @@ mod config;
 mod console;
 mod core;
 mod errors;
-mod parser;
+mod parse;
 mod winget;
+mod prettify;
 
 fn main() {
     let exit_code = main_with_exit_code();
@@ -18,16 +15,22 @@ fn main() {
 }
 
 fn main_with_exit_code() -> i32 {
-    let app_name = app::APP_NAME;
-    let app_version = app::APP_VERSION;
-    let app_author = app::APP_AUTHOR;
-    let app_date = app::APP_DATE;
     println!();
-    println!("{app_name} {app_version} (by {app_author} {app_date})");
+    println!(
+        "{} {} (by {} {})",
+        app::NAME,
+        app::VERSION,
+        app::AUTHOR,
+        app::DATE
+    );
     println!();
     if !args::valid() {
-        console::show_usage(app_name, !args::has_help());
+        console::show_usage(app::NAME, false);
         return 1;
+    }
+    if args::help() {
+        console::show_usage(app::NAME, true);
+        return 0;
     }
     let closure = || -> Result<(), String> {
         winget::installed()?;
@@ -40,10 +43,13 @@ fn main_with_exit_code() -> i32 {
         let progress_closure = || console::flush(|| print!("."));
         let package_infos = core::analyze(packages, progress_closure)?;
         console::flush(|| print!("... finished."));
-        if check_valid_packages(package_infos) {
-            console::show_invalid_packages_error(invalid_packages);
-            return Err("boing".to_string());
-        }
+        // let invalid_packages = get_iv_packages(&package_infos);
+
+        // if invalid_packages.len() == 0 {
+            //     console::show_invalid_packages_error(invalid_packages);
+            //     return Err("boing".to_string());
+            console::show_goodby_message();
+        //}
 
         // var nonInstalledPackages = packageInfos.Where(packageInfo => !packageInfo.IsInstalled).Select(packageInfo => packageInfo.Package);
         // if (nonInstalledPackages.Any())
@@ -71,12 +77,13 @@ fn main_with_exit_code() -> i32 {
     }
 }
 
-fn check_valid_packages(package_infos: Vec<&String>) -> bool {
-    package_infos
-        .iter()
-        .filter(|package_info| !package_info.is_valid)
-        .map(|package_info| &package_info.package)
-        .collect()
-        .len()
-        > 0
-}
+// fn get_iv_packages(package_infos: &[core::PackageInfo]) -> &[String] {
+//     let s = package_infos
+//         .iter()
+//         .filter(|&package_info| package_info.is_valid)
+//         .map(|package_info| package_info.package.to_string())
+//         .collect::<Vec<String>>();
+//     let x = s;
+
+//     &x
+// }

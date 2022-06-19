@@ -1,5 +1,5 @@
 use crate::app::AppResult;
-use crate::parser;
+use crate::parse;
 use crate::winget;
 
 pub fn search(package: &str) -> AppResult<bool> {
@@ -27,10 +27,11 @@ pub fn list(package: &str) -> AppResult<ListResult> {
     let result = winget::execute(&command)?;
     let installed = result.exit_code == 0 && result.console_output.contains(package);
     if installed {
-        let parse_result = parser::parse_list_output(&result.console_output)?;
-        Ok(build_list_result(package, true, Some(parse_result)))
+        let parse_result = parse::parse_winget_listoutput(&result.console_output)?;
+        let has_update = has_update(&result.console_output, &parse_result.new_version);
+        Ok(build_list_result(package, true, has_update, Some(parse_result)))
     } else {
-        Ok(build_list_result(package, false, None))
+        Ok(build_list_result(package, false, false, None))
     }
 }
 
@@ -46,14 +47,15 @@ pub fn upgrade(package: &str) -> AppResult<bool> {
 fn build_list_result(
     package: &str,
     is_installed: bool,
-    parse_result_option: Option<parser::ParseResult>,
+    has_update: bool,
+    parse_result_option: Option<parse::ParseResult>,
 ) -> ListResult {
     let package = package.to_string();
     match parse_result_option {
         Some(parse_result) => ListResult {
             package,
             is_installed,
-            is_updatable: parse_result.has_update,
+            is_updatable: has_update,
             installed_version: parse_result.old_version,
             update_version: parse_result.new_version,
         },
@@ -65,4 +67,10 @@ fn build_list_result(
             update_version: "".to_string(),
         },
     }
+}
+
+fn has_update(output: &str, new_version: &str) -> bool {
+    let has_upd_text = output.contains(" Verfügbar ") || output.contains(" Available ");
+    let has_new_version = !new_version.is_empty();
+    has_upd_text && has_new_version
 }

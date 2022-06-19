@@ -1,6 +1,11 @@
-pub type AppResult<T> = Result<T, String>;
+use crate::errors;
 
-pub const APP_NAME: &str = env!("CARGO_PKG_NAME");
-pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
-pub const APP_AUTHOR: &str = "MBODM";
-pub const APP_DATE: &str = "2022-05-21";
+// We need no functions here to verify name and version from cargo.toml file,
+// since cargo shows some error, if name or version contains an empty string.
+
+pub const NAME: &str = env!("CARGO_PKG_NAME");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const AUTHOR: &str = "MBODM";
+pub const DATE: &str = "2022-05-21";
+
+pub type AppResult<T> = Result<T, errors::AppError>;

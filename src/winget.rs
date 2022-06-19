@@ -19,17 +19,15 @@ pub struct WinGetResult {
     pub exit_code: i32,
 }
 
-pub fn execute(params: &str) -> AppResult<WinGetResult> {
+pub fn execute(params: &str) -> Result<WinGetResult, String> {
     let params = params.trim();
     assert!(!params.is_empty());
     let output = Command::new(WINGET_APP)
         .args(params.split(" "))
         .output()
         .map_err(|err| err.convert(ERROR_NOT_FOUND))?;
-    let output_string = String::from_utf8(output.stdout)
-        .map_err(|_| String::from("WinGet output-format invalid."))?;
     let process_call = format!("{WINGET_APP} {params}");
-    let console_output = remove_progressbar_chars(&output_string);
+    let console_output = String::from_utf8(output.stdout).map_err(|_| "WinGet output invalid.")?;
     let exit_code = output
         .status
         .code()
@@ -39,12 +37,4 @@ pub fn execute(params: &str) -> AppResult<WinGetResult> {
         console_output,
         exit_code,
     })
-}
-
-fn remove_progressbar_chars(output_string: &str) -> String {
-    output_string
-        .trim()
-        .replacen(&['\u{0008}', '|', '/', '-', '\\'][..], "", 1)
-        .trim()
-        .to_string()
 }

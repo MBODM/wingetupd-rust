@@ -9,8 +9,8 @@ where
     stdout().flush().expect(errors::UNRECOVERABLE);
 }
 
-pub fn show_usage(exe_file: &str, show_error: bool) {
-    if show_error {
+pub fn show_usage(exe_file: &str, is_help: bool) {
+    if !is_help {
         println!("Error: Unknown parameter(s).");
         println!();
     }

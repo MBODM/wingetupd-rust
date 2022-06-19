@@ -1,4 +1,4 @@
-use crate::{app::AppResult, commands};
+use crate::{app::AppResult, commands, commands::ListResult};
 
 #[derive(Debug)]
 pub struct PackageInfo {
@@ -17,10 +17,9 @@ where
     packages
         .iter()
         .map(|package| {
-            let package: String = package.into();
-            let valid = commands::search(&package)?;
+            let valid = commands::search(package)?;
             progress();
-            let list_result = commands::list(&package)?;
+            let list_result = commands::list(package)?;
             progress();
             let package_info = build_package_info(package, valid, list_result);
             Ok(package_info)
@@ -28,13 +27,9 @@ where
         .collect()
 }
 
-fn build_package_info(
-    package: String,
-    is_valid: bool,
-    list_result: commands::ListResult,
-) -> PackageInfo {
+fn build_package_info(package: &String, is_valid: bool, list_result: ListResult) -> PackageInfo {
     PackageInfo {
-        package,
+        package: package.to_string(),
         is_valid,
         is_installed: list_result.is_installed,
         is_updatable: list_result.is_updatable,
