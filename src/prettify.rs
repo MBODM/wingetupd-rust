@@ -13,7 +13,8 @@
 pub fn prettify_winget_output(winget_output: &str) -> &str {
     // Solely prettify output containing the "Name " substring, like
     // in example some successful WinGet "search" or "list" commands.
-    // Be careful when using this function for another WinGet output.
+    // Be careful when using this function for another WinGet output,
+    // that´s maybe containing a "Name " substring for other reasons.
     // Remember: The find() function returns a byte position and not
     // a character position (see Rust docs). But this doesn´t matter
     // here. What matters is what´s done starting FROM that position.
