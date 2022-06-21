@@ -1,10 +1,10 @@
-use crate::{app::AppResult, errors::ErrorExtension};
+use crate::errors::ErrorExtension;
 use std::process::Command;
 
 const WINGET_APP: &str = "winget.exe";
 const ERROR_NOT_FOUND: &str = "WinGet not installed.";
 
-pub fn installed() -> AppResult<()> {
+pub fn installed() -> Result<(), String> {
     Command::new(WINGET_APP)
         .arg("--version")
         .output() /* Not using status(), cause it prints to console. */

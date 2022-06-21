@@ -1,12 +1,24 @@
-use crate::app::AppResult;
 use crate::parse;
 use crate::winget;
 
-pub fn search(package: &str) -> AppResult<bool> {
+type WinGetRunnerFn = fn(winget_params: &str) -> Result<WinGetRunnerResult, String>;
+struct WinGetRunnerResult {
+    process_call: String,
+    console_output: String,
+    exit_code: u32,
+}
+
+type WinGetListParserFn = fn(winget_list_output: &str) -> Result<WinGetListParserResult, String>;
+struct WinGetListParserResult {
+    old_version: String,
+    new_version: String,
+}
+
+pub fn search(package: &str, runner: WinGetRunnerFn) -> Result<bool, String> {
     let package = package.trim();
     assert!(!package.is_empty());
-    let command = format!("search --exact --id {package}");
-    let result = winget::execute(&command)?;
+    let params = format!("search --exact --id {package}");
+    let result = runner(&params)?;
     let valid = result.exit_code == 0 && result.console_output.contains(package);
     Ok(valid)
 }
@@ -20,22 +32,27 @@ pub struct ListResult {
     pub update_version: String,
 }
 
-pub fn list(package: &str) -> AppResult<ListResult> {
+pub fn list(package: &str) -> Result<ListResult, String> {
     let package = package.trim();
     assert!(!package.is_empty());
     let command = format!("list --exact --id {package}");
     let result = winget::execute(&command)?;
     let installed = result.exit_code == 0 && result.console_output.contains(package);
     if installed {
-        let parse_result = parse::parse_winget_listoutput(&result.console_output)?;
+        let parse_result = parse::parse_winget_list_output(&result.console_output)?;
         let has_update = has_update(&result.console_output, &parse_result.new_version);
-        Ok(build_list_result(package, true, has_update, Some(parse_result)))
+        Ok(build_list_result(
+            package,
+            true,
+            has_update,
+            Some(parse_result),
+        ))
     } else {
         Ok(build_list_result(package, false, false, None))
     }
 }
 
-pub fn upgrade(package: &str) -> AppResult<bool> {
+pub fn upgrade(package: &str) -> Result<bool, String> {
     let package = package.trim();
     assert!(!package.is_empty());
     let command = format!("upgrade --exact --id {package}");

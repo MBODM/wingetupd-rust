@@ -1,7 +1,5 @@
 pub const UNRECOVERABLE: &str = "[WinGetUpd - Unrecoverable application error]";
 
-pub type AppError = String;
-
 pub trait ErrorExtension {
     fn convert(&self, custom_not_found_message: &str) -> String;
 }
