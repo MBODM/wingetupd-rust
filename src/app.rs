@@ -20,17 +20,21 @@ pub fn run() -> Result<bool, String> {
         console::show_usage(NAME, true);
         return Ok(true);
     }
-    winget::installed()?;
-    config::package_file_exists()?;
-    let packages = config::read_package_file()?;
-    if packages.len() == 0 {
-        return Err(String::from("Package-file is empty."));
-    }
-        console::flush(|| print!("processing ..."));
-        let progress_closure = || console::flush(|| print!("."));
-        let package_infos = core::analyze(packages, progress_closure)?;
-        console::flush(|| print!("... finished."));
-        // let invalid_packages = get_iv_packages(&package_infos);
+
+
+
+
+    // winget::installed()?;
+    // config::package_file_exists()?;
+    // let packages = config::read_package_file()?;
+    // if packages.len() == 0 {
+    //     return Err(String::from("Package-file is empty."));
+    // }
+    //     // console::flush(|| print!("processing ..."));
+        // let progress_closure = || console::flush(|| print!("."));
+        // let package_infos = core::analyze(packages, progress_closure)?;
+        // console::flush(|| print!("... finished."));
+        // // let invalid_packages = get_iv_packages(&package_infos);
 
         // if invalid_packages.len() == 0 {
         //     console::show_invalid_packages_error(invalid_packages);
@@ -45,10 +49,10 @@ pub fn run() -> Result<bool, String> {
         //     Environment.Exit(1);
         // }
 
-        println!();
-        for package_info in package_infos.iter() {
-            let s = &package_info.package;
-            console::flush(|| println!("{s}"));
+        // println!();
+        // for package_info in package_infos.iter() {
+        //     let s = &package_info.package;
+        //     console::flush(|| println!("{s}"));
 
 
     Ok(true)
