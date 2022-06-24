@@ -1,4 +1,4 @@
-use crate::{core::PackageInfo, errors};
+use crate::{app, core::PackageInfo, errors};
 use std::io::{stdout, Write};
 
 pub fn flush<T>(print_macro: T)
@@ -7,6 +7,16 @@ where
 {
     print_macro();
     stdout().flush().expect(errors::UNRECOVERABLE);
+}
+
+pub fn show_title() {
+    println!(
+        "{} {} (by {} {})",
+        app::NAME,
+        app::VERSION,
+        app::AUTHOR,
+        app::DATE
+    );
 }
 
 pub fn show_usage(exe_file: &str, is_help: bool) {
