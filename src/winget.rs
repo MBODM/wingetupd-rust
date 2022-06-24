@@ -1,4 +1,3 @@
-use crate::errors::ErrorExtension;
 use std::process::Command;
 
 const WINGET_APP: &str = "winget.exe";
@@ -8,7 +7,7 @@ pub fn installed() -> Result<(), String> {
     Command::new(WINGET_APP)
         .arg("--version")
         .output() /* Not using status(), cause it prints to console. */
-        .map_err(|err| err.convert(ERROR_NOT_FOUND))?;
+        .map_err(|err| get_err_msg(err))?;
     Ok(())
 }
 
@@ -25,7 +24,7 @@ pub fn execute(params: &str) -> Result<WinGetResult, String> {
     let output = Command::new(WINGET_APP)
         .args(params.split(" "))
         .output()
-        .map_err(|err| err.convert(ERROR_NOT_FOUND))?;
+        .map_err(|err| get_err_msg(err))?;
     let process_call = format!("{WINGET_APP} {params}");
     let console_output = String::from_utf8(output.stdout).map_err(|_| "WinGet output invalid.")?;
     let exit_code = output
@@ -37,4 +36,11 @@ pub fn execute(params: &str) -> Result<WinGetResult, String> {
         console_output,
         exit_code,
     })
+}
+
+fn get_err_msg(error: std::io::Error) -> String {
+    match error.kind() {
+        std::io::ErrorKind::NotFound => ERROR_NOT_FOUND.to_string(),
+        _ => error.to_string(),
+    }
 }
