@@ -1,4 +1,5 @@
-use crate::{app, core::PackageInfo, errors};
+use super::packages;
+use crate::app;
 use std::io::{stdout, Write};
 
 pub fn flush<T>(print_macro: T)
@@ -6,7 +7,7 @@ where
     T: Fn() -> (),
 {
     print_macro();
-    stdout().flush().expect(errors::UNRECOVERABLE);
+    stdout().flush().expect("todo")
 }
 
 pub fn show_title() {
@@ -62,7 +63,7 @@ pub fn show_non_installed_packages_error(non_installed_packages: Vec<&String>) {
     println!("Please verify package-file and try again.");
 }
 
-pub fn show_summary(package_infos: Vec<PackageInfo>) {
+pub fn show_summary(package_infos: Vec<packages::PackageInfo>) {
     //let valid_packages: Vec<String> = package_infos.iter().filter(|x| x.is_valid).map(|y|&y.package).collect();
 
     //             var validPackages = packageInfos.Where(packageInfo => packageInfo.IsValid).Select(packageInfo => packageInfo.Package);
@@ -124,7 +125,7 @@ pub fn show_summary(package_infos: Vec<PackageInfo>) {
 //             ListPackages(updatedPackages);
 //         }
 
-pub fn show_goodby_message() {
+pub fn show_goodbye_message() {
     println!("Have a nice day.");
 }
 

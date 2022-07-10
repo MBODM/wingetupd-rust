@@ -10,7 +10,7 @@
 // fine, because if WinGet ever changing things that drastically,
 // chances are good this tool will need different changes anyway.
 
-pub fn prettify_winget_output(winget_output: &str) -> &str {
+pub fn prettify_output(winget_output: &str) -> &str {
     // Solely prettify output containing the "Name " substring, like
     // in example some successful WinGet "search" or "list" commands.
     // Be careful when using this function for another WinGet output,

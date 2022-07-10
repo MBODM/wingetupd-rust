@@ -1,4 +1,4 @@
-use crate::{app::AppResult, commands, commands::ListResult};
+use super::commands;
 
 #[derive(Debug)]
 pub struct PackageInfo {
@@ -10,14 +10,20 @@ pub struct PackageInfo {
     pub update_version: String,
 }
 
-pub fn analyze<T>(packages: Vec<String>, progress: T) -> AppResult<Vec<PackageInfo>>
+pub fn analyze<T>(packages: Vec<String>, progress: T) -> Result<Vec<PackageInfo>, String>
 where
     T: Fn() -> (),
 {
     packages
         .iter()
         .map(|package| {
-            let valid = commands::search(package)?;
+            let valid = {
+                let package = package.trim();
+                assert!(!package.is_empty());
+                let params = format!("search --exact --id {package}");
+                let valid = commands::search(&params)?;
+                Ok(valid)
+            }?;
             progress();
             let list_result = commands::list(package)?;
             progress();

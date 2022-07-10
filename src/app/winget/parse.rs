@@ -1,17 +1,16 @@
 extern crate regex;
-use crate::errors::UNRECOVERABLE;
 use regex::Regex;
 
 #[derive(Debug)]
-pub struct ParseResult {
+pub struct WinGetParseResult {
     pub old_version: String,
     pub new_version: String,
 }
 
-pub fn parse_winget_list_output(list_output: &str) -> Result<ParseResult, String> {
+pub fn parse_list_output(list_output: &str) -> Result<WinGetParseResult, String> {
     let list_output = list_output.trim();
     assert!(!list_output.is_empty());
-    let regex = Regex::new(r"\d+(\.\d+)+").expect(UNRECOVERABLE);
+    let regex = Regex::new(r"\d+(\.\d+)+").map_err(|_| "WinGet output regex parsing failed.".to_string())?;
     let versions = regex
         .find_iter(list_output)
         .map(|m| m.as_str())
@@ -24,7 +23,7 @@ pub fn parse_winget_list_output(list_output: &str) -> Result<ParseResult, String
     }
     let old_version = (if versions.len() > 0 { versions[0] } else { "" }).to_string();
     let new_version = (if versions.len() > 1 { versions[1] } else { "" }).to_string();
-    Ok(ParseResult {
+    Ok(WinGetParseResult {
         old_version,
         new_version,
     })
