@@ -1,4 +1,5 @@
 mod app;
+mod winget;
 
 // How to gracefully exit a rust app with an exit code? See here:
 // https://stackoverflow.com/questions/30281235/how-to-cleanly-end-the-program-with-an-exit-code

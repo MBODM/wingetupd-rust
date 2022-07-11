@@ -1,6 +1,7 @@
-use super::packages;
 use crate::app;
 use std::io::{stdout, Write};
+
+use super::packages;
 
 pub fn flush<T>(print_macro: T)
 where

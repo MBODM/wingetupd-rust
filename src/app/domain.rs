@@ -1,4 +1,4 @@
-use crate::app::{self, domain::console, helper::args};
+use crate::app::{self, args, console};
 
 pub fn run() -> Result<bool, String> {
     if !args::valid() {

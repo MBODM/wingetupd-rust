@@ -10,7 +10,9 @@
 // fine, because if WinGet ever changing things that drastically,
 // chances are good this tool will need different changes anyway.
 
-pub fn prettify_output(winget_output: &str) -> &str {
+// Todo: Change text below
+
+pub fn prettify_list_output(list_output: &str) -> &str {
     // Solely prettify output containing the "Name " substring, like
     // in example some successful WinGet "search" or "list" commands.
     // Be careful when using this function for another WinGet output,
@@ -18,10 +20,10 @@ pub fn prettify_output(winget_output: &str) -> &str {
     // Remember: The find() function returns a byte position and not
     // a character position (see Rust docs). But this doesn´t matter
     // here. What matters is what´s done starting FROM that position.
-    let pos_option = winget_output.find("Name ");
+    let pos_option = list_output.find("Name ");
     let str_result = match pos_option {
-        Some(i) => &winget_output[i..],
-        None => winget_output,
+        Some(i) => &list_output[i..],
+        None => list_output,
     };
     str_result
 }

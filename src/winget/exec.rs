@@ -2,7 +2,7 @@ use std::{io::ErrorKind, process::Command};
 
 const WINGET_APP: &str = "winget.exe";
 
-pub fn installed() -> bool {
+pub fn winget_installed() -> bool {
     // Using .output() here, cause .status() prints to console.
     let result = Command::new(WINGET_APP).arg("--version").output();
     // If there is NOT a NotFound error, this means WinGet is definitely installed.
@@ -22,7 +22,7 @@ pub struct WinGetExecuteResult {
     pub exit_code: i32,
 }
 
-pub fn execute(params: &str) -> Result<WinGetExecuteResult, String> {
+pub fn execute_winget(params: &str) -> Result<WinGetExecuteResult, String> {
     let params = params.trim();
     assert!(!params.is_empty());
     let output = Command::new(WINGET_APP)
