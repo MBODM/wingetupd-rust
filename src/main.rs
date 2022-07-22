@@ -7,12 +7,12 @@ mod winget;
 
 fn main() -> Result<(), ()> {
     println!();
-    app::show_prolog();
+    app::show_title();
     println!();
     match app::run() {
-        Ok(show_epilog) => {
-            if show_epilog {
-                app::show_epilog();
+        Ok(show_goodbye_message) => {
+            if show_goodbye_message {
+                app::show_goodbye_message();
             }
             // Since Rust 1.26 this leads to platform-specific EXIT_SUCCESS:
             Ok(())
