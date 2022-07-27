@@ -1,7 +1,4 @@
-use super::util;
 use std::process::Command;
-
-pub const WINGET_APP: &str = "winget.exe";
 
 #[derive(Debug)]
 pub struct WinGetExecuteResult {
@@ -10,17 +7,18 @@ pub struct WinGetExecuteResult {
     pub exit_code: i32,
 }
 
-pub fn execute_winget(params: &str) -> Result<WinGetExecuteResult, String> {
+pub fn execute(params: &str) -> Result<WinGetExecuteResult, String> {
     let params = params.trim();
     assert!(!params.is_empty());
-    let output = Command::new(WINGET_APP)
+    let app = super::WINGET_APP;
+    let output = Command::new(app)
         .args(params.split(" "))
         .output()
-        .map_err(|err| match util::is_not_found_error(err) {
+        .map_err(|err| match super::util::is_not_found_error(err) {
             true => "WinGet is not installed.".to_string(),
             false => err.to_string(),
         })?;
-    let process_call = format!("{WINGET_APP} {params}");
+    let process_call = format!("{app} {params}");
     let console_output =
         String::from_utf8(output.stdout).map_err(|_| "WinGet output format is invalid.")?;
     let exit_code = output

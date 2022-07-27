@@ -6,6 +6,11 @@ mod winget;
 // https://stackoverflow.com/questions/24245276/why-does-rust-not-have-a-return-value-in-the-main-function-and-how-to-return-a
 
 fn main() -> Result<(), ()> {
+
+
+winget::
+
+
     println!();
     app::show_title();
     println!();

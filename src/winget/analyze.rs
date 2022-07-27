@@ -1,5 +1,6 @@
 use super::parse::WinGetParseResult;
 
+#[derive(Debug)]
 pub struct WinGetAnalyzeResult {
     package_has_update: bool,
 }
