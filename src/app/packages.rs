@@ -1,5 +1,7 @@
 use crate::app::commands;
 
+use super::{common::AppError, commands::ListResult};
+
 #[derive(Debug)]
 pub struct PackageInfo {
     pub package: String,
@@ -10,7 +12,7 @@ pub struct PackageInfo {
     pub update_version: String,
 }
 
-pub fn analyze<T>(packages: Vec<String>, progress: T) -> Result<Vec<PackageInfo>, String>
+pub fn analyze<T>(packages: Vec<String>, progress: T) -> Result<Vec<PackageInfo>, AppError>
 where
     T: Fn() -> (),
 {

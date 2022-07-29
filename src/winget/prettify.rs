@@ -1,29 +1,29 @@
-// This module is rather short now, because it´s not possible to
-// create a fixed pattern that´s matching the "ugly head" of the
-// WinGet output string always and for 100% sure. This statement
-// is true for the single progress bar chars (see older versions
-// of the code in GitHub´s commit history), as well as for these
-// weird download graphs (see some example graphs in the comment
-// below). Therefore it seems the most secure way is to find the
-// position of the always-existing "Name " substring and to grab
-// the "tail" of the WinGet output string from there. Imo that´s
-// fine, because if WinGet ever changing things that drastically,
-// chances are good this tool will need different changes anyway.
+////////////////////////////////////////////////////////////////////
+// This module is rather short now, because it´s not possible to  //
+// create a fixed pattern that´s matching the "ugly head" of the  //
+// WinGet output string always and for 100% sure. This statement  //
+// is true for the single progress bar chars (see older versions  //
+// of the code in GitHub´s commit history), as well as for these  //
+// weird download graphs (see some example graphs in the comment  //
+// below). Therefore it seems the most secure way is to find the  //
+// position of the always-existing "Name " substring and to grab  //
+// the "tail" of the WinGet output string from there. Imo that´s  //
+// fine, because if WinGet ever changing things that drastically, //
+// chances are good this tool will need different changes anyway. //
+////////////////////////////////////////////////////////////////////
 
-// Todo: Change text below
-
-pub fn prettify_list_output(list_output: &str) -> &str {
-    // Solely prettify output containing the "Name " substring, like
+pub fn prettify_output(output: &str) -> &str {
+    // Solely prettify output which contains "Name " substring, like
     // in example some successful WinGet "search" or "list" commands.
     // Be careful when using this function for another WinGet output,
-    // that´s maybe containing a "Name " substring for other reasons.
+    // which maybe contains some "Name " substring for other reasons.
+    let pos_option = output.find("Name ");
     // Remember: The find() function returns a byte position and not
     // a character position (see Rust docs). But this doesn´t matter
     // here. What matters is what´s done starting FROM that position.
-    let pos_option = list_output.find("Name ");
     let str_result = match pos_option {
-        Some(i) => &list_output[i..],
-        None => list_output,
+        Some(i) => &output[i..],
+        None => output,
     };
     str_result
 }

@@ -5,18 +5,16 @@
 
 // Module externals:
 
-pub use analyze::{analyze_list_output, WinGetAnalyzeResult};
-pub use exec::{execute, WinGetExecuteResult};
-pub use parse::{parse_list_output, WinGetParseResult};
-pub use prettify::prettify_list_output;
-pub use util::installed;
+pub use common::WinGetError;
+pub use exec::{execute, ExecuteData};
+pub use parse::{parse_list_output, ParseListOutputData};
+pub use prettify::prettify_output;
+pub use util::is_installed;
 
 // Module internals:
 
-mod analyze;
+mod common;
 mod exec;
 mod parse;
 mod prettify;
 mod util;
-
-const WINGET_APP: &str = "winget.exe";

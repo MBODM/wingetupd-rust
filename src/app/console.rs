@@ -1,5 +1,6 @@
-use crate::app;
 use std::io::{stdout, Write};
+
+use crate::app::common;
 
 use super::packages;
 
@@ -14,10 +15,10 @@ where
 pub fn show_title() {
     println!(
         "{} {} (by {} {})",
-        app::NAME,
-        app::VERSION,
-        app::AUTHOR,
-        app::DATE
+        common::APP_NAME,
+        common::APP_VERSION,
+        common::APP_AUTHOR,
+        common::APP_DATE
     );
 }
 

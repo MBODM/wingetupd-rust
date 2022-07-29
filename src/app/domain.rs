@@ -1,12 +1,14 @@
-use crate::app::{self, args, console};
+use crate::app::{args, console};
+
+use super::common;
 
 pub fn run() -> Result<bool, String> {
     if !args::valid() {
-        console::show_usage(app::NAME, false);
+        console::show_usage(common::APP_NAME, false);
         return Ok(false);
     }
     if args::help() {
-        console::show_usage(app::NAME, true);
+        console::show_usage(common::APP_NAME, true);
         return Ok(true);
     }
 
