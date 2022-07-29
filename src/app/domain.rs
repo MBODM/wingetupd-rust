@@ -7,7 +7,7 @@ pub fn run() -> Result<bool, String> {
         console::show_usage(common::APP_NAME, false);
         return Ok(false);
     }
-    if args::help() {
+    if args::has_help() {
         console::show_usage(common::APP_NAME, true);
         return Ok(true);
     }

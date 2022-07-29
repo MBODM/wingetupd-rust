@@ -10,10 +10,10 @@ pub fn valid() -> bool {
         .all(|arg| supported_args.contains(&arg.as_str()))
 }
 
-pub fn no_confirm() -> bool {
+pub fn has_no_confirm() -> bool {
     env::args().skip(1).any(|arg| arg == NO_CONFIRM_ARG)
 }
 
-pub fn help() -> bool {
+pub fn has_help() -> bool {
     env::args().skip(1).any(|arg| arg == HELP_ARG)
 }

@@ -1,6 +1,6 @@
 use crate::app::commands;
 
-use super::{common::AppError, commands::ListResult};
+use super::common::AppError;
 
 #[derive(Debug)]
 pub struct PackageInfo {
@@ -27,21 +27,17 @@ where
                 Ok(valid)
             }?;
             progress();
-            let list_result = commands::list(package)?;
+            let list_result = commands::list(&package)?;
             progress();
-            let package_info = build_package_info(package, valid, list_result);
+            let package_info = PackageInfo {
+                package: package.to_string(),
+                is_valid: valid,
+                is_installed: list_result.is_installed,
+                is_updatable: list_result.is_updatable,
+                installed_version: list_result.installed_version,
+                update_version: list_result.update_version,
+            };
             Ok(package_info)
         })
         .collect()
-}
-
-fn build_package_info(package: &String, is_valid: bool, list_result: ListResult) -> PackageInfo {
-    PackageInfo {
-        package: package.to_string(),
-        is_valid,
-        is_installed: list_result.is_installed,
-        is_updatable: list_result.is_updatable,
-        installed_version: list_result.installed_version,
-        update_version: list_result.update_version,
-    }
 }
