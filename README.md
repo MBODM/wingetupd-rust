@@ -6,9 +6,9 @@ I recently was curious about the Rust programming language. So i started a redev
 
 Another reason was also: `wingetupd.exe` (as a .NET 6 self-contained application) is around 10-15 MB in size. The `wingetupd-rust.exe` will become more like 1-2 MB in size.
 
-But the main reason was: "_Let´s have some fun with Rust_" 😁
+But the main reason was: "*Let´s have some fun with Rust*" 😁
 
-*So, let´s get rusty!*
+**So, let´s get rusty!**
 
 ----------
 
