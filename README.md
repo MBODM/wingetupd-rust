@@ -8,7 +8,7 @@ Another reason was also: `wingetupd.exe` (as a .NET 6 self-contained application
 
 But the main reason was: Let´s have some fun with Rust! 😁
 
-#### So let´s get rusty.
+#### So, let´s get rusty.
 
 ----------
 
