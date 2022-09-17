@@ -1,8 +1,9 @@
-use std::io::{stdout, Write};
+use super::{app, packages::PackageInfo};
 
-use crate::app::common;
-
-use super::packages;
+use std::{
+    intrinsics::const_eval_select,
+    io::{stdout, Write},
+};
 
 pub fn flush<T>(print_macro: T)
 where
@@ -15,10 +16,10 @@ where
 pub fn show_title() {
     println!(
         "{} {} (by {} {})",
-        common::APP_NAME,
-        common::APP_VERSION,
-        common::APP_AUTHOR,
-        common::APP_DATE
+        app::NAME,
+        app::VERSION,
+        app::AUTHOR,
+        app::DATE
     );
 }
 
@@ -37,12 +38,13 @@ pub fn show_usage(exe_file: &str, is_help: bool) {
     );
 }
 
-//         public static void ShowPackageFileEntries(IEnumerable<string> packageFileEntries)
-//         {
-//             println!($"Found package-file, containing {packageFileEntries.Count()} {EntryOrEntries(packageFileEntries)}.");
-//         }
+pub fn show_package_file_entries(package_file_entries: Vec<String>) {
+    let i = package_file_entries.len();
+    let s = entry_or_entries(package_file_entries);
+    println!("Found package-file, containing {i} {s}.");
+}
 
-pub fn show_invalid_packages_error(invalid_packages: Vec<&String>) {
+pub fn show_invalid_packages_error(invalid_packages: Vec<String>) {
     println!("Error: The package-file contains invalid entries.");
     println!();
     println!("The following package-file entries are not valid WinGet package id´s:");
@@ -53,7 +55,7 @@ pub fn show_invalid_packages_error(invalid_packages: Vec<&String>) {
     println!("Please verify package-file and try again.");
 }
 
-pub fn show_non_installed_packages_error(non_installed_packages: Vec<&String>) {
+pub fn show_non_installed_packages_error(non_installed_packages: Vec<String>) {
     println!("Error: The package-file contains non-installed packages.");
     println!();
     println!("The following package-file entries are valid WinGet package id´s,");
@@ -65,30 +67,40 @@ pub fn show_non_installed_packages_error(non_installed_packages: Vec<&String>) {
     println!("Please verify package-file and try again.");
 }
 
-pub fn show_summary(package_infos: Vec<packages::PackageInfo>) {
-    //let valid_packages: Vec<String> = package_infos.iter().filter(|x| x.is_valid).map(|y|&y.package).collect();
-
-    //             var validPackages = packageInfos.Where(packageInfo => packageInfo.IsValid).Select(packageInfo => packageInfo.Package);
-    //             var installedPackages = packageInfos.Where(packageInfo => packageInfo.IsInstalled).Select(packageInfo => packageInfo.Package);
-    //             var updatablePackages = packageInfos.Where(packageInfo => packageInfo.IsUpdatable);
-
-    //             println!($"{packageInfos.Count()} package-file {EntryOrEntries(packageInfos)} processed.");
-
-    //             println!($"{validPackages.Count()} package-file {EntryOrEntries(packageInfos)} validated.");
-
-    //             println!($"{installedPackages.Count()} {PackageOrPackages(installedPackages)} installed:");
-    //             ListPackages(installedPackages);
-
-    //             Console.Write($"{updatablePackages.Count()} {PackageOrPackages(updatablePackages)} updatable");
-    //             if (updatablePackages.Any())
-    //             {
-    //                 println!(":");
-    //                 ListUpdateablePackages(updatablePackages);
-    //             }
-    //             else
-    //             {
-    //                 println!(".");
-    //             }
+pub fn show_summary(package_infos: Vec<PackageInfo>) {
+    let i = package_infos.len();
+    let s = entry_or_entries(package_infos);
+    println!("{i} package-file {s} processed.");
+    let valid_packages = package_infos
+        .iter()
+        .filter(|&&pi| pi.is_valid)
+        .map(|&pi| pi.package)
+        .collect::<Vec<String>>();
+    let i = valid_packages.len();
+    let s = entry_or_entries(valid_packages);
+    println!("{i} package-file {s} validated.");
+    let installed_packages = package_infos
+        .iter()
+        .filter(|&&pi| pi.is_installed)
+        .map(|&pi| pi.package)
+        .collect::<Vec<String>>();
+    let i = installed_packages.len();
+    let s = package_or_packages(installed_packages);
+    println!("{i} {s} installed:");
+    list_packages(installed_packages);
+    let updatable_packages = package_infos
+        .iter()
+        .filter(|&&pi| pi.is_updatable)
+        .collect::<Vec<PackageInfo>>();
+    let i = updatable_packages.len();
+    let s = package_or_packages(updatable_packages);
+    println!("{i} {s} updatable");
+    if updatable_packages.len() != 0 {
+        println!(":");
+        list_updateable_packages(updatable_packages);
+    } else {
+        println!(".");
+    }
 }
 
 //         public static bool AskUpdateQuestion(IEnumerable<string> updateablePackages)
@@ -152,24 +164,32 @@ pub fn show_goodbye_message() {
 //             println!(winGetWebSite);
 //         }
 
-//         private static string EntryOrEntries<T>(IEnumerable<T> enumerable) =>
-//             SingularOrPlural(enumerable, "entry", "entries");
-
-//         private static string PackageOrPackages<T>(IEnumerable<T> enumerable) =>
-//             SingularOrPlural(enumerable, "package", "packages");
-
-//         private static string SingularOrPlural<T>(IEnumerable<T> enumerable, string singular, string plural) =>
-//             enumerable.Count() == 1 ? singular : plural;
-
-fn list_packages(packages: Vec<&String>) {
-    packages
-        .iter()
-        .for_each(|package| println!("  - {package}"))
+fn entry_or_entries<T>(vec: Vec<T>) -> String {
+    singular_or_plural(vec, "entry", "entries")
 }
 
-//         private static void ListPackages(IEnumerable<string> packages) =>
-//             packages.ToList().ForEach(package => println!($"  - {package}"));
+fn package_or_packages<T>(vec: Vec<T>) -> String {
+    singular_or_plural(vec, "package", "packages")
+}
 
-//         private static void ListUpdateablePackages(IEnumerable<PackageInfo> packageInfos) =>
-//             packageInfos.ToList().ForEach(pi => println!($"  - {pi.Package} {pi.InstalledVersion} => {pi.UpdateVersion}"));
-//     }
+fn singular_or_plural<T>(vec: Vec<T>, singular: &str, plural: &str) -> String {
+    match vec.len() == 1 {
+        true => singular.to_string(),
+        false => plural.to_string(),
+    }
+}
+
+fn list_packages(packages: Vec<String>) {
+    packages
+        .iter()
+        .for_each(|&package| println!("  - {package}"))
+}
+
+fn list_updateable_packages(package_infos: Vec<PackageInfo>) {
+    package_infos.iter().for_each(|&pi| {
+        let package = pi.package;
+        let installed_version = pi.installed_version;
+        let update_version = pi.update_version;
+        println!("  - {package} {installed_version} => {update_version}");
+    });
+}

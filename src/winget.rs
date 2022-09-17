@@ -5,16 +5,14 @@
 
 // Module externals:
 
-pub use common::WinGetError;
-pub use exec::{execute, ExecuteData};
+pub use err::WinGetError;
 pub use parse::{parse_list_output, ParseListOutputData};
 pub use prettify::prettify_output;
-pub use util::is_installed;
+pub use sys::{execute, is_installed, ExecuteData};
 
 // Module internals:
 
-mod common;
-mod exec;
+mod err;
 mod parse;
 mod prettify;
-mod util;
+mod sys;

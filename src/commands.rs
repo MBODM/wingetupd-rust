@@ -1,11 +1,10 @@
-use super::common::AppError;
-use crate::winget;
+use super::{err::AppError, winget};
 
 pub fn search(package: &str) -> Result<bool, AppError> {
     let package = package.trim();
     assert!(!package.is_empty());
     let params = format!("search --exact --id {package}");
-    let data = winget::execute(&params).map_err(|err| AppError::new(err.message))?;
+    let data = winget::execute(&params).map_err(|err| AppError::new(err.msg))?;
     let valid = data.exit_code == 0 && data.console_output.contains(package);
     Ok(valid)
 }
@@ -23,11 +22,11 @@ pub fn list(package: &str) -> Result<ListData, AppError> {
     let package = package.trim();
     assert!(!package.is_empty());
     let params = format!("list --exact --id {package}");
-    let data = winget::execute(&params).map_err(|err| AppError::new(err.message))?;
+    let data = winget::execute(&params).map_err(|err| AppError::new(err.msg))?;
     let is_installed = data.exit_code == 0 && data.console_output.contains(package);
     if is_installed {
         let parse_data = winget::parse_list_output(&data.console_output)
-            .map_err(|err| AppError::new(err.message))?;
+            .map_err(|err| AppError::new(err.msg))?;
         Ok(build_list_data(package, Some(parse_data)))
     } else {
         Ok(build_list_data(package, None))
@@ -38,7 +37,7 @@ pub fn upgrade(package: &str) -> Result<bool, AppError> {
     let package = package.trim();
     assert!(!package.is_empty());
     let params = format!("upgrade --exact --id {package}");
-    let data = winget::execute(&params).map_err(|err| AppError::new(err.message))?;
+    let data = winget::execute(&params).map_err(|err| AppError::new(err.msg))?;
     let upgraded = data.exit_code == 0;
     Ok(upgraded)
 }

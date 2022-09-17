@@ -1,11 +1,11 @@
+use super::err::AppError;
+
 use std::{
     env,
     fs::File,
     io::{BufRead, BufReader},
     path::{Path, PathBuf},
 };
-
-use super::common::AppError;
 
 const PACKAGE_FILE_NAME: &str = "packages.txt";
 
