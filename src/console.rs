@@ -91,7 +91,7 @@ pub fn show_summary(package_infos: Vec<PackageInfo>) {
     let updatable_packages = package_infos
         .iter()
         .filter(|&&pi| pi.is_updatable)
-        .collect::<Vec<PackageInfo>>();
+        .collect::<Vec<&PackageInfo>>();
     let i = updatable_packages.len();
     let s = package_or_packages(updatable_packages);
     println!("{i} {s} updatable");
@@ -185,8 +185,8 @@ fn list_packages(packages: Vec<String>) {
         .for_each(|&package| println!("  - {package}"))
 }
 
-fn list_updateable_packages(package_infos: Vec<PackageInfo>) {
-    package_infos.iter().for_each(|&pi| {
+fn list_updateable_packages(package_infos: Vec<&PackageInfo>) {
+    package_infos.iter().for_each(|&&pi| {
         let package = pi.package;
         let installed_version = pi.installed_version;
         let update_version = pi.update_version;
