@@ -14,4 +14,4 @@ pub const DATE: &str = "2022-07-22";
 // meanwhile maybe not written a single line of Rust code. So, therefore i
 // made my life a bit easier, by using this type alias, when using a slice.
 
-type SliceOf<'a, T> = &'a[T];
+pub type SliceOf<'a, T> = &'a [T];

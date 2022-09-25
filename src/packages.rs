@@ -1,10 +1,7 @@
-use super::{commands, err::AppError};
+use super::{app::SliceOf, commands, err::AppError};
 
-
-type MySlice<'a, T> = &'a[T];
-type StringSlice<'a> = &'a[String];
-type PackageInfoSlice<'a> = &'a[PackageInfo];
-
+type StringSlice<'a> = &'a [String];
+type PackageInfoSlice<'a> = &'a [PackageInfo];
 
 #[derive(Debug)]
 pub struct PackageInfo {
@@ -16,7 +13,10 @@ pub struct PackageInfo {
     pub update_version: String,
 }
 
-pub fn analyze<T>(packages_slice: &[String], progress_handler: T) -> Result<Vec<PackageInfo>, AppError>
+pub fn analyze<T>(
+    packages_slice: &[String],
+    progress_handler: T,
+) -> Result<Vec<PackageInfo>, AppError>
 where
     T: Fn() -> (),
 {
@@ -26,7 +26,7 @@ where
             let valid = commands::search(package.as_str())?;
             progress_handler();
             if !valid {
-                return Ok(PackageInfo{
+                return Ok(PackageInfo {
                     package,
                     is_valid: false,
                     is_installed: false,
@@ -57,38 +57,34 @@ where
 // what´s going on here, in a year from now, without much Rust coding meanwhile, i
 // don´t want to be that complex syntax-wise, just for some 0.0000001% performance.
 
-pub fn get_valid_packages(package_infos: MySlice<PackageInfo>) -> Vec<String>
+pub fn get_valid_packages(package_infos: &[PackageInfo]) -> &[String] {
+    get_packages(package_infos, |package_info| package_info.is_valid)
+}
+
+pub fn get_invalid_packages(package_infos: &[PackageInfo]) -> &[String] {
+    get_packages(package_infos, |package_info| !package_info.is_valid)
+}
+
+pub fn get_installed_packages(package_infos: &[PackageInfo]) -> &[String] {
+    get_packages(package_infos, |package_info| package_info.is_installed)
+}
+
+pub fn get_non_installed_packages(package_infos: &[PackageInfo]) -> &[String] {
+    get_packages(package_infos, |package_info| !package_info.is_installed)
+}
+
+
+
+
+fn get_packages<T>(package_infos: &[PackageInfo], filter_predicate: T) -> &[String]
+where
+    T: Fn(PackageInfo) -> bool,
 {
-    package_infos.iter().filter(|&&pi| pi.is_valid).map(|&pi| pi.package).collect()
+    let vec = package_infos
+        .iter()
+        .filter(|&&package_info| filter_predicate(package_info))
+        .map(|&package_info| package_info.package)
+        .collect::<Vec<_>>();
+    let slice = &vec[..];
+    slice
 }
-
-pub fn get_invalid_packages(package_infos: Vec<PackageInfo>) -> Vec<String>
-{
-    package_infos.iter().filter(|&&pi| !pi.is_valid).map(|&pi| pi.package).collect()
-}
-
-fn do_the_thing(foos: &[PackageInfo]) -> &[String]{ 
-    let bar0_foos = foos.iter().filter(|f| f.is_valid == true).map(|f| f.package).collect::<Vec<String>>();
-    return &bar0_foos;
-}
-
-// pub fn get_invalid_packages(package_infos: Vec<PackageInfo>) -> Vec<String>
-// {
-//     package_infos.iter().filter(|&&pi| !pi.is_valid).map(|&pi| pi.package).collect()
-// }
-
-// pub fn get_invalid_packages(package_infos: Vec<PackageInfo>) -> Vec<String>
-// {
-//     package_infos.iter().filter(|&&pi| !pi.is_valid).map(|&pi| pi.package).collect()
-// }
-
-// pub fn get_invalid_packages(package_infos: Vec<PackageInfo>) -> Vec<String>
-// {
-//     package_infos.iter().filter(|&&pi| !pi.is_valid).map(|&pi| pi.package).collect()
-// }
-
-// pub fn get_invalid_packages(package_infos: Vec<PackageInfo>) -> Vec<String>
-// {
-//     package_infos.iter().filter(|&&pi| !pi.is_valid).map(|&pi| pi.package).collect()
-// }
-
